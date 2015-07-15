@@ -13,10 +13,10 @@
  * @private
  */
 
-var etag = require('etag');
-var fresh = require('fresh');
-var fs = require('fs');
-var ms = require('ms');
+//var etag = require('etag');
+//var fresh = require('fresh');
+//var fs = require('fs');
+//var ms = require('ms');
 var parseUrl = require('parseurl');
 var path = require('path');
 var resolve = path.resolve;
@@ -44,17 +44,22 @@ var maxMaxAge = 60 * 60 * 24 * 365 * 1000; // 1 year
  * @return {Function} middleware
  */
 
-function favicon(path, options) {
-  var opts = options || {};
+function favicon(url) {
+  var opts = {
+    symbolColor: '#ffffff'
+  };
+  // If url isn't a string, it is a config object
+  if(url.toString() !== url) opts = url;
+  else                       opts.url = url;
 
   var buf;
   var icon; // favicon cache
-  var maxAge = calcMaxAge(opts.maxAge);
+  //var maxAge = calcMaxAge(opts.maxAge);
   var stat;
 
-  if (!path) throw new TypeError('path to favicon.ico is required');
+  //if (!path) throw new TypeError('path to favicon.ico is required');
 
-  if (Buffer.isBuffer(path)) {
+  /*if (Buffer.isBuffer(path)) {
     buf = new Buffer(path.length);
     path.copy(buf);
 
@@ -65,10 +70,25 @@ function favicon(path, options) {
     if (stat.isDirectory()) throw createIsDirError(path);
   } else {
     throw new TypeError('path to favicon.ico must be string or buffer');
-  }
+  }*/
+  
+  var reqIsHTML = function(req){
+    return !!req.headers.accept.match(/text\/html/);
+  };
+  // If no host header is to be found, intelligently guess what the host is from the connection
+  var getHostFromConnection = function(connection){
+    var address = connection.address();
+    return address.address + ':' + address.port;
+  };
 
   return function favicon(req, res, next){
-    if (parseUrl(req).pathname !== '/favicon.ico') {
+    
+    //req.connection.address() could be used
+    // We haven't created the icon yet!
+    var host;
+    if(!icon && req.method === 'GET' && reqIsHTML(req)) host = req.headers.host || req.connection.address();
+    
+    if (parseUrl(req).pathname !== '/favicon.ico' || parseUrl(req).pathname !== '/favicon.png') {
       next();
       return;
     }
@@ -83,11 +103,16 @@ function favicon(path, options) {
 
     if (icon) return send(req, res, icon);
 
+    res.end();
+
+    //send(req, res, icon);
+    /*
     fs.readFile(path, function(err, buf){
       if (err) return next(err);
       icon = createIcon(buf, maxAge);
       send(req, res, icon);
     });
+    */
   };
 };
 
