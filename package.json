@@ -20,5 +20,6 @@
   "bugs": {
     "url": "https://github.com/stipsan/serve-dynamic-favicon/issues"
   },
-  "homepage": "https://github.com/stipsan/serve-dynamic-favicon#readme"
+  "homepage": "https://github.com/stipsan/serve-dynamic-favicon#readme",
+  "files": ["index.js"]
 }
