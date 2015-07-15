@@ -1,0 +1,24 @@
+{
+  "name": "serve-dynamic-favicon",
+  "version": "1.0.0",
+  "description": "middleware that serve dynamically generated favicons",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stipsan/serve-dynamic-favicon.git"
+  },
+  "keywords": [
+    "express",
+    "favicon",
+    "middleware"
+  ],
+  "author": "Stian Didriksen <stipsan@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stipsan/serve-dynamic-favicon/issues"
+  },
+  "homepage": "https://github.com/stipsan/serve-dynamic-favicon#readme"
+}
