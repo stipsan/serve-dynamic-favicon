@@ -8,7 +8,7 @@ This is very useful for when you're running expressjs or BrowserSync servers.
 ## Install
 
 ```bash
-npm install serve-dynamic-favicon
+npm install serve-dynamic-favicon --production --no-optional
 ```
 
 ## API

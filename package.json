@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "middleware that serve dynamically generated favicons",
   "main": "index.js",
-  "config" : { "port" : "8080" },
+  "config": {
+    "port": "8080"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -22,5 +24,14 @@
     "url": "https://github.com/stipsan/serve-dynamic-favicon/issues"
   },
   "homepage": "https://github.com/stipsan/serve-dynamic-favicon#readme",
-  "files": ["index.js"]
+  "files": [
+    "index.js"
+  ],
+  "dependencies": {
+    "parseurl": "^1.3.0"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {
+    "finalhandler": "^0.4.0"
+  }
 }
