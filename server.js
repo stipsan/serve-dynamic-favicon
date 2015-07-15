@@ -1,5 +1,5 @@
 var http = require('http');
-var favicon = require('serve-dynamic-favicon');
+var favicon = require('./index.js');
 var finalhandler = require('finalhandler');
 
 var _favicon = favicon('https://github.com');
