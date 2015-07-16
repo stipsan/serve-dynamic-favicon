@@ -20,6 +20,7 @@
 var parseUrl = require('parseurl');
 var path = require('path');
 var resolve = path.resolve;
+var request = require('request');
 
 /**
  * Module exports.
@@ -52,6 +53,7 @@ function favicon(url) {
   if(url.toString() !== url) opts = url;
   else                       opts.url = url;
 
+  var analysing; 
   var buf;
   var icon; // favicon cache
   //var maxAge = calcMaxAge(opts.maxAge);
@@ -83,10 +85,32 @@ function favicon(url) {
 
   return function favicon(req, res, next){
     
+    if(analysing) return next();
+    
     //req.connection.address() could be used
     // We haven't created the icon yet!
-    var host;
-    if(!icon && req.method === 'GET' && reqIsHTML(req)) host = req.headers.host || req.connection.address();
+    if(!icon && req.method === 'GET' && reqIsHTML(req)) {
+      var host = req.headers.host || getHostFromConnection(req.connection);
+      
+      analysing = true;
+      
+      //@TODO do not hardcode the protocol
+      var x = request('http://' + host + req.url, function (error, response, body) {
+        console.log(response.statusCode);
+        if (!error && response.statusCode == 200) {
+          var modifiedBody = body.replace(/<\/body>(?![\s\S]*<\/body>)/, function () {
+              return 'stian' + "\n" + arguments[0];
+          });
+          analysing = false;
+          console.log(modifiedBody);
+          response.end(modifiedBody);
+        } else next(error);
+      });
+      req.pipe(x);
+      x.pipe(res);
+      
+      return;
+    }
     
     if (parseUrl(req).pathname !== '/favicon.ico' || parseUrl(req).pathname !== '/favicon.png') {
       next();

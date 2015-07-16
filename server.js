@@ -10,24 +10,19 @@ var server = http.createServer(function onRequest(req, res) {
   _favicon(req, res, function onNext(err) {
     if (err) return done(err);
 
-    // continue to process the request here, etc.
-
-    res.statusCode = 404;
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    res.write('<!DOCTYPE html>');
+    res.write('<html>');
+    res.write('<head>');
+    res.write('<title>Hello World!</title>');
+    res.write('<meta name="theme-color" content="#007BB6">');
+    res.write('</head>');
+    res.write('<body>');
+    res.write('Hello World!');
+    res.write('</body>');
+    res.write('</html>');
     res.end();
   });
-  
-  res.writeHead(200, {'Content-Type': 'text/html'});
-  res.write('<!DOCTYPE html>');
-  res.write('<html>');
-  res.write('<head>');
-  res.write('<title>Hello World!</title>');
-  res.write('<meta name="theme-color" content="#007BB6">');
-  res.write('</head>');
-  res.write('<body>');
-  res.write('Hello World!');
-  res.write('</body>');
-  res.write('</html>');
-  res.end();
 });
 
 // In case this script is started using node or node-debug instead of `npm start`
