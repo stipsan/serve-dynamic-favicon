@@ -46,10 +46,10 @@ var maxMaxAge = 60 * 60 * 24 * 365 * 1000; // 1 year
  */
 
 function favicon(url) {
-  var tmpLetters = "ABCDEFGHIJKLMNOPQRSTVWXYZÆØÅ@1234567890+?!§¢$&%".split("");
   var opts = {
-    symbol: tmpLetters[Math.floor(Math.random()*tmpLetters.length)],
-    symbolColor: '#ffffff'
+    symbol: false,
+    symbolColor: '#ffffff',
+    symbolBackgroundColor: false
   };
   // If url isn't a string, it is a config object
   if(url && url.toString() !== url) opts = url;
@@ -87,35 +87,41 @@ function favicon(url) {
   // Node.js does not implement canvas, thus we render the favicon in the client
   var canvasScript = function(opts){
     
-    var tmpLetters = "ABCDEFGHIJKLMNOPQRSTVWXYZÆØÅabcdefghijklmnopqrstvwxyzæøå@1234567890+?!§¢$&%".split("");
-    var tmpColors = ["#007BB6", "teal", "olive", "hotpink", "crimson", "darkcyan", "deeppink", "SeaGreen", "Sienna"];
+    var symbol = opts.symbol || document.title[0] || location.hostname[0];
+    var symbolBackgroundColor = opts.themeColor || getSymbolBackgroundColor();
+    var favicon = drawFavicon();
     
-    var canvas = document.createElement('canvas');
-    canvas.width = 16;canvas.height = 16;
-    var ctx = canvas.getContext('2d');
-    
-    var scaleFactor = backingScale(ctx);
-        if (scaleFactor > 1) {
-        canvas.width = canvas.width * scaleFactor;
-        canvas.height = canvas.height * scaleFactor;
-        // update the context for the new canvas scale
-        var ctx = canvas.getContext("2d");
-    }
-    
-    ctx.fillStyle = tmpColors[Math.floor(Math.random()*tmpColors.length)];
-    //ctx.fillRect(0, 0, canvas.width, canvas.height);
-    roundedRect(ctx, 0, 0, canvas.width, canvas.height, 2 * scaleFactor);
-    ctx.fill();
-    ctx.fillStyle = opts.symbolColor;
-    ctx.font = (canvas.height-(canvas.height/4))+'px system, -apple-system, ".SFNSDisplay-Regular", "Helvetica Neue", "Lucida Grande", sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(tmpLetters[Math.floor(Math.random()*tmpLetters.length)], canvas.width/2, canvas.height / 2);
+    function drawFavicon(){
+      
+      var canvas = document.createElement('canvas');
+      canvas.width = 16;canvas.height = 16;
+      var ctx = canvas.getContext('2d');
+      
+      var scaleFactor = backingScale(ctx);
+          if (scaleFactor > 1) {
+          canvas.width = canvas.width * scaleFactor;
+          canvas.height = canvas.height * scaleFactor;
+          // update the context for the new canvas scale
+          var ctx = canvas.getContext("2d");
+      }
+      
+      ctx.fillStyle = symbolBackgroundColor;
+      //ctx.fillRect(0, 0, canvas.width, canvas.height);
+      roundedRect(ctx, 0, 0, canvas.width, canvas.height, 2 * scaleFactor);
+      ctx.fill();
+      ctx.fillStyle = opts.symbolColor;
+      ctx.font = (canvas.height-(canvas.height/4))+'px system, -apple-system, ".SFNSDisplay-Regular", "Helvetica Neue", "Lucida Grande", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(symbol, canvas.width/2, canvas.height / 2);
+      
+      return canvas;
+    };
 
     var link = document.createElement('link');
     link.type = 'image/x-icon';
     link.rel = 'shortcut icon';
-    link.href = canvas.toDataURL("image/x-icon");
+    link.href = favicon.toDataURL("image/x-icon");
     document.getElementsByTagName('head')[0].appendChild(link);
     
     // A utility function to draw a rectangle with rounded corners.
@@ -139,6 +145,21 @@ function favicon(url) {
           }
       }
       return 1;
+    }
+    
+    function getSymbolBackgroundColor(){
+      // Android >=5.0 && OS X Safari >=9.0
+      var themeColor = document.querySelector('meta[name="theme-color"]');
+      if(themeColor && themeColor.content) return themeColor.content;
+      // Windows >=8 app tile colors
+      themeColor = document.querySelector('meta[name="msapplication-TileColor"]');
+      if(themeColor && themeColor.content) return themeColor.content;
+      // IE >=9 pinned site ui color
+      themeColor = document.querySelector('meta[name="msapplication-navbutton-color"]');
+      if(themeColor && themeColor.content) return themeColor.content;
+      // Oh crap
+      var tmpColors = ["#007BB6", "teal", "olive", "hotpink", "crimson", "darkcyan", "deeppink", "SeaGreen", "Sienna"];
+      return tmpColors[Math.floor(Math.random()*tmpColors.length)];
     }
   };
 
@@ -165,6 +186,7 @@ function favicon(url) {
           res.end(modifiedBody);
         } else next(error);
       });
+      req.pipe(x);
       
       return;
     }
