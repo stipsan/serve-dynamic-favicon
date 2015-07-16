@@ -46,11 +46,13 @@ var maxMaxAge = 60 * 60 * 24 * 365 * 1000; // 1 year
  */
 
 function favicon(url) {
+  var tmpLetters = "ABCDEFGHIJKLMNOPQRSTVWXYZÆØÅ@1234567890+?!§¢$&%".split("");
   var opts = {
+    symbol: tmpLetters[Math.floor(Math.random()*tmpLetters.length)],
     symbolColor: '#ffffff'
   };
   // If url isn't a string, it is a config object
-  if(url.toString() !== url) opts = url;
+  if(url && url.toString() !== url) opts = url;
   else                       opts.url = url;
 
   var analysing; 
@@ -82,6 +84,63 @@ function favicon(url) {
     var address = connection.address();
     return address.address + ':' + address.port;
   };
+  // Node.js does not implement canvas, thus we render the favicon in the client
+  var canvasScript = function(opts){
+    
+    var tmpLetters = "ABCDEFGHIJKLMNOPQRSTVWXYZÆØÅabcdefghijklmnopqrstvwxyzæøå@1234567890+?!§¢$&%".split("");
+    var tmpColors = ["#007BB6", "teal", "olive", "hotpink", "crimson", "darkcyan", "deeppink", "SeaGreen", "Sienna"];
+    
+    var canvas = document.createElement('canvas');
+    canvas.width = 16;canvas.height = 16;
+    var ctx = canvas.getContext('2d');
+    
+    var scaleFactor = backingScale(ctx);
+        if (scaleFactor > 1) {
+        canvas.width = canvas.width * scaleFactor;
+        canvas.height = canvas.height * scaleFactor;
+        // update the context for the new canvas scale
+        var ctx = canvas.getContext("2d");
+    }
+    
+    ctx.fillStyle = tmpColors[Math.floor(Math.random()*tmpColors.length)];
+    //ctx.fillRect(0, 0, canvas.width, canvas.height);
+    roundedRect(ctx, 0, 0, canvas.width, canvas.height, 2 * scaleFactor);
+    ctx.fill();
+    ctx.fillStyle = opts.symbolColor;
+    ctx.font = (canvas.height-(canvas.height/4))+'px system, -apple-system, ".SFNSDisplay-Regular", "Helvetica Neue", "Lucida Grande", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(tmpLetters[Math.floor(Math.random()*tmpLetters.length)], canvas.width/2, canvas.height / 2);
+
+    var link = document.createElement('link');
+    link.type = 'image/x-icon';
+    link.rel = 'shortcut icon';
+    link.href = canvas.toDataURL("image/x-icon");
+    document.getElementsByTagName('head')[0].appendChild(link);
+    
+    // A utility function to draw a rectangle with rounded corners.
+    function roundedRect(ctx,x,y,width,height,radius){
+      ctx.beginPath();
+      ctx.moveTo(x,y+radius);
+      ctx.lineTo(x,y+height-radius);
+      ctx.quadraticCurveTo(x,y+height,x+radius,y+height);
+      ctx.lineTo(x+width-radius,y+height);
+      ctx.quadraticCurveTo(x+width,y+height,x+width,y+height-radius);
+      ctx.lineTo(x+width,y+radius);
+      ctx.quadraticCurveTo(x+width,y,x+width-radius,y);
+      ctx.lineTo(x+radius,y);
+      ctx.quadraticCurveTo(x,y,x,y+radius);
+    }
+    
+    function backingScale(context) {
+      if ('devicePixelRatio' in window) {
+          if (window.devicePixelRatio > 1) {
+              return window.devicePixelRatio;
+          }
+      }
+      return 1;
+    }
+  };
 
   return function favicon(req, res, next){
     
@@ -99,15 +158,13 @@ function favicon(url) {
         console.log(response.statusCode);
         if (!error && response.statusCode == 200) {
           var modifiedBody = body.replace(/<\/body>(?![\s\S]*<\/body>)/, function () {
-              return 'stian' + "\n" + arguments[0];
+              return "\n<script>\n(" + canvasScript.toString() + ")("+JSON.stringify(opts)+");\n</script>\n" + arguments[0];
           });
           analysing = false;
           console.log(modifiedBody);
-          response.end(modifiedBody);
+          res.end(modifiedBody);
         } else next(error);
       });
-      req.pipe(x);
-      x.pipe(res);
       
       return;
     }
