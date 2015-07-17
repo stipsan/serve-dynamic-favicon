@@ -1,5 +1,7 @@
 # serve-dynamic-favicon
 
+# PLEASE NOTE THIS IS IN ALPHA
+
 Node.js middleware for serving a favicon that is generated on the fly.
 Using the first letter of the the `<title>` tag overlayed a background color fetched from the `<meta name="theme-color" content="#007BB6">` you'll reduce the cognitive load when switching between browser tabs.
 You may specify any url you want for where the metadata will be fetched from, or you can pass the letter and theme-color and save the initial request.
@@ -76,7 +78,7 @@ var http = require('http');
 var favicon = require('serve-dynamic-favicon');
 var finalhandler = require('finalhandler');
 
-var _favicon = favicon('https://github.com');
+var _favicon = favicon();
 
 var server = http.createServer(function onRequest(req, res) {
   var done = finalhandler(req, res);

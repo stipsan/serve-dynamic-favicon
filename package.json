@@ -1,6 +1,6 @@
 {
   "name": "serve-dynamic-favicon",
-  "version": "1.0.0",
+  "version": "0.1.0-alpha1",
   "description": "middleware that serve dynamically generated favicons",
   "main": "index.js",
   "config": {
