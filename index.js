@@ -110,10 +110,9 @@ function favicon(url) {
       roundedRect(ctx, 0, 0, canvas.width, canvas.height, 2 * scaleFactor);
       ctx.fill();
       ctx.fillStyle = opts.symbolColor;
-      ctx.font = (canvas.height-(canvas.height/4))+'px system, -apple-system, ".SFNSDisplay-Regular", "Helvetica Neue", "Lucida Grande", sans-serif';
+      ctx.font = (canvas.height-(canvas.height/4)+(1.5*scaleFactor))+'px system, -apple-system, ".SFNSDisplay-Regular", "Helvetica Neue", "Lucida Grande", sans-serif';
       ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(symbol, canvas.width/2, canvas.height / 2);
+      ctx.fillText(symbol, canvas.width/2, canvas.height - (canvas.height / 4) + scaleFactor);
       
       return canvas;
     };
@@ -122,6 +121,10 @@ function favicon(url) {
     link.type = 'image/x-icon';
     link.rel = 'shortcut icon';
     link.href = favicon.toDataURL("image/x-icon");
+    
+    // Only Gecko can do this
+    //canvas.toBlob(blobCallback('passThisString'), 'image/vnd.microsoft.icon', '-moz-parse-options:format=bmp;bpp=32');
+    
     document.getElementsByTagName('head')[0].appendChild(link);
     
     // A utility function to draw a rectangle with rounded corners.
@@ -180,13 +183,13 @@ function favicon(url) {
         uri: 'http://' + host + req.url,
         gzip: true
       }, function (error, response, body) {
-        console.log(response.statusCode);
+        //console.log(response.statusCode);
         if (!error && response.statusCode == 200) {
           var modifiedBody = body.replace(/<\/body>(?![\s\S]*<\/body>)/, function () {
               return "\n<script>\n(" + canvasScript.toString() + ")("+JSON.stringify(opts)+");\n</script>\n" + arguments[0];
           });
           analysing = false;
-          console.log(modifiedBody);
+          //console.log(modifiedBody);
           res.end(modifiedBody);
         } else next(error);
       });

@@ -2,7 +2,7 @@ var http = require('http');
 var favicon = require('./index.js');
 var finalhandler = require('finalhandler');
 
-var _favicon = favicon('https://github.com');
+var _favicon = favicon();
 
 var server = http.createServer(function onRequest(req, res) {
   var done = finalhandler(req, res);
