@@ -175,7 +175,11 @@ function favicon(url) {
       analysing = true;
       
       //@TODO do not hardcode the protocol
-      var x = request('http://' + host + req.url, function (error, response, body) {
+      var x = request({
+        method: 'GET',
+        uri: 'http://' + host + req.url,
+        gzip: true
+      }, function (error, response, body) {
         console.log(response.statusCode);
         if (!error && response.statusCode == 200) {
           var modifiedBody = body.replace(/<\/body>(?![\s\S]*<\/body>)/, function () {
