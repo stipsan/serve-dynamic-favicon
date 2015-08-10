@@ -77,7 +77,7 @@ function favicon(url) {
   }*/
   
   var reqIsHTML = function(req){
-    return !!req.headers.accept.match(/text\/html/);
+    return req.headers.accept && !!req.headers.accept.match(/text\/html/);
   };
   // If no host header is to be found, intelligently guess what the host is from the connection
   var getHostFromConnection = function(connection){
