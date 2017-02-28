@@ -1,5 +1,7 @@
 # serve-dynamic-favicon
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/stipsan/serve-dynamic-favicon.svg)](https://greenkeeper.io/)
+
 [![NPM](https://nodei.co/npm/serve-dynamic-favicon.png?downloads=true)](https://www.npmjs.com/package/serve-dynamic-favicon)
 [![NPM](https://nodei.co/npm-dl/serve-dynamic-favicon.png?months=3&height=2)](https://nodei.co/npm/serve-dynamic-favicon/)
 
